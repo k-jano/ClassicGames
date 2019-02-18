@@ -126,3 +126,13 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/java,gradle,intellij
+
+
+### Idea ###
+.idea/*
+
+### Gradle ###
+# gradle/wrapper/gradle-wrapper.properties
+
+### Iml ###
+*.iml
