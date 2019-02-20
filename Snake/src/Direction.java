@@ -1,3 +1,3 @@
 public enum Direction {
-    VERTICAL_L, VERTICAL_R, HORIZONTAL_U, HORIZONTAL_D
+    LEFT, RIGHT, UP, DOWN
 }
