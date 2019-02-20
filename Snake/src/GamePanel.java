@@ -78,6 +78,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     void tick() throws InterruptedException {
+        //Get direction
         for(int i=snake.size()-1; i>=0; i--) {
             SnakePart snakePart = snake.get(i);
             if(snakePart.equals(snake.get(0))){
@@ -96,6 +97,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
 
+        //Calculate evr part direction
         for(SnakePart snakePart: snake){
             Direction direction = snakePart.getDirection();
             if(direction.equals(Direction.RIGHT)){
@@ -109,9 +111,45 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
 
+        SnakePart snakeHead = snake.get(0);
         int snakeHeadX = snake.get(0).getX();
         int snakeHeadY = snake.get(0).getY();
-        if(snakeHeadX >= WIDTH || snakeHeadX < 0 || snakeHeadY >= HEIGHT || snakeHeadY <=0){
+
+        //Point collision
+        if(snakeHeadX == point.getX() && snakeHeadY == point.getY()){
+            SnakePart snakeLast = snake.get(snake.size()-1);
+            Direction direction = snakeLast.getDirection();
+            int newX, newY;
+            if(direction.equals(Direction.RIGHT)){
+                newX = snakeLast.getX()-step;
+                newY = snakeLast.getY();
+            } else if(direction.equals(Direction.LEFT)){
+                newX = snakeLast.getX()+step;
+                newY = snakeLast.getY();
+            } else if(direction.equals(Direction.UP)){
+                newX = snakeLast.getX();
+                newY = snakeLast.getY()+step;
+            } else {
+                newX = snakeLast.getX();
+                newY = snakeLast.getY()-step;
+            }
+            SnakePart snakePart = new SnakePart(newX, newY, direction);
+            snake.add(snakePart);
+
+            point= getRandomCorsPoint();
+        }
+
+        //Body collision
+        for(SnakePart snakePart : snake){
+            if(!snakeHead.equals(snakePart)){
+                if(snakePart.getX()==snakeHeadX && snakePart.getY()==snakeHeadY){
+                    stop();
+                }
+            }
+        }
+
+        //Walls collision
+        if(snakeHeadX >= WIDTH || snakeHeadX < 0 || snakeHeadY >= HEIGHT || snakeHeadY <0){
             stop();
         }
         Thread.sleep(80);
