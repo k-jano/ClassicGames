@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 class GamePanel extends JPanel implements Runnable, KeyListener {
@@ -14,17 +15,16 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private boolean running;
     private ArrayList<SnakePart> snake;
     private Point point;
-    private boolean right, left, up, down;
+    private LinkedList<Direction> directions;
+    private Direction headDirection;
 
     GamePanel(){
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         snake = new ArrayList<>();
+        directions = new LinkedList<>();
+        headDirection = Direction.RIGHT;
         setFocusable(true);
         addKeyListener(this);
-        right=true;
-        left=false;
-        up=false;
-        down=false;
         start();
     }
 
@@ -60,7 +60,10 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         }
 
         for(SnakePart snakePart: snake){
-            g.setColor(Color.MAGENTA);
+            if(snakePart.equals(snake.get(0)))
+                g.setColor(Color.RED);
+            else
+                g.setColor(Color.MAGENTA);
             int x = snakePart.getX();
             int y = snakePart.getY();
             for(int i=0; i<step; i++){
@@ -78,17 +81,23 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     void tick() throws InterruptedException {
+        Thread.sleep(80);
+
+        if(directions.size()!=0){
+            headDirection = directions.get(0);
+            directions.pop();
+        }
         //Get direction
         for(int i=snake.size()-1; i>=0; i--) {
             SnakePart snakePart = snake.get(i);
             if(snakePart.equals(snake.get(0))){
-                if(left) {
+                if(headDirection.equals(Direction.LEFT)) {
                     snakePart.setDirection(Direction.LEFT);
-                } else if(right){
+                } else if(headDirection.equals(Direction.RIGHT)){
                     snakePart.setDirection(Direction.RIGHT);
-                } else if(up){
+                } else if(headDirection.equals(Direction.UP)){
                     snakePart.setDirection(Direction.UP);
-                }else if(down){
+                }else if(headDirection.equals(Direction.DOWN)){
                     snakePart.setDirection(Direction.DOWN);
                 }
             } else {
@@ -152,7 +161,6 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
         if(snakeHeadX >= WIDTH || snakeHeadX < 0 || snakeHeadY >= HEIGHT || snakeHeadY <0){
             stop();
         }
-        Thread.sleep(80);
 
     }
 
@@ -197,22 +205,14 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if(key==KeyEvent.VK_RIGHT && !left){
-            right=true;
-            up=false;
-            down=false;
-        } else if(key==KeyEvent.VK_LEFT && !right){
-            left=true;
-            up=false;
-            down=false;
-        } else if(key==KeyEvent.VK_UP && !down){
-            right=false;
-            left=false;
-            up=true;
-        }else if(key==KeyEvent.VK_DOWN && !up){
-            right=false;
-            left=false;
-            down=true;
+        if(key==KeyEvent.VK_RIGHT && !headDirection.equals(Direction.LEFT) && !headDirection.equals(Direction.RIGHT)){
+            directions.push(Direction.RIGHT);
+        } else if(key==KeyEvent.VK_LEFT && !headDirection.equals(Direction.RIGHT) && !headDirection.equals(Direction.LEFT)){
+            directions.push(Direction.LEFT);
+        } else if(key==KeyEvent.VK_UP && !headDirection.equals(Direction.DOWN) && !headDirection.equals(Direction.UP)){
+            directions.push(Direction.UP);
+        }else if(key==KeyEvent.VK_DOWN && !headDirection.equals(Direction.UP) && !headDirection.equals(Direction.DOWN)){
+            directions.push(Direction.DOWN);
         }
     }
 }
