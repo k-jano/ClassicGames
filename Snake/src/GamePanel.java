@@ -10,6 +10,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private static final long serialVersionUID = 1L;
     private final int WIDTH = 600, HEIGHT = 600;
+    private final int HEIGTH_TOTAL = 700;
     private int step =20;
     private Thread thread;
     private boolean running;
@@ -17,14 +18,17 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
     private Point point;
     private LinkedList<Direction> directions;
     private Direction headDirection;
+    private int scoreCounter;
+    private final int PADDING_UP = 20, PADDING_LEFT = 20;
 
     GamePanel(){
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setPreferredSize(new Dimension(WIDTH, HEIGTH_TOTAL));
         snake = new ArrayList<>();
         directions = new LinkedList<>();
         headDirection = Direction.RIGHT;
         setFocusable(true);
         addKeyListener(this);
+        scoreCounter = 0;
         start();
     }
 
@@ -44,10 +48,10 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
 
     public void paint(Graphics g){
         g.setColor(Color.BLACK);
-        g.fillRect(0,0,WIDTH, HEIGHT);
+        g.fillRect(0,0,WIDTH, HEIGTH_TOTAL);
 
         g.setColor(Color.GRAY);
-        for(int i=0; i<HEIGHT; i+=step){
+        for(int i=0; i<=HEIGHT; i+=step){
             for(int j=0; j<WIDTH; j+=step){
                 g.drawLine(j,i, j+step, i);
             }
@@ -78,6 +82,11 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             g.drawLine(x+i, y, x+i, y+step);
         }
 
+        //JTextField textField = new JTextField("sth");
+        g.setColor(Color.WHITE);
+        Font stringFont = new Font( "SansSerif", Font.PLAIN, 18 );
+        g.setFont(stringFont);
+        g.drawString("Your score: " + scoreCounter, PADDING_LEFT, HEIGHT + PADDING_UP);
     }
 
     void tick() throws InterruptedException {
@@ -146,6 +155,7 @@ class GamePanel extends JPanel implements Runnable, KeyListener {
             snake.add(snakePart);
 
             point= getRandomCorsPoint();
+            scoreCounter++;
         }
 
         //Body collision
